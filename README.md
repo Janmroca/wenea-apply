@@ -2,6 +2,9 @@
 
 Backend code test for Wenea by Jan Manrique Roca.
 
+API is deployed in port 3000.
+WebSocket is deployed in port 8080.
+
 ## How to run ##
 
 **Installation**

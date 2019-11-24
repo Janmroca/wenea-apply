@@ -1,4 +1,5 @@
 const chargepointService = require("../services/chargepointService.js")
+const statusNotifierService = require("../services/statusNotifierService.js")
 const CHARGEPOINT_STATUS = [ "ready", "charging", "waiting", "error" ]
 const NAME_MAX_SIZE = 32
 
@@ -74,7 +75,11 @@ module.exports = {
                         return res.status(404).send("Doesn't exist a chargepoint with that id.")
 
                     chargepointService.updateChargepoint(req.params.id, { status: req.body.status })
-                        .then( () => res.status(200).send() )
+                        .then( () => 
+                        {
+                            statusNotifierService.pushStatusChange(req.params.id, req.body.status)
+                            res.status(200).send()
+                        })
                 })
         } catch (error) {
             return res.status(400).send(error)
