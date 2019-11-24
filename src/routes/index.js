@@ -1,7 +1,7 @@
 module.exports = function (express) {
     const router = express.Router();
 
-    // Contributors routes
+    // Chargepoints routes
     require("./chargepoints.js")(router);
 
     return router;

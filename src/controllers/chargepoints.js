@@ -7,12 +7,14 @@ module.exports = {
     createChargepoint: async function (req, res) {
         const { name: name, status: status } = req.body;
 
+        if (!status)
+            return res.status(400).send("Status must be specified.")
         if (!CHARGEPOINT_STATUS.includes(status))
             return res.status(400).send("Specified status is not valid.")
-
+        if (!name)
+            return res.status(400).send("Name must be specified.")
         if (name.length > NAME_MAX_SIZE) 
             return res.status(400).send(`Name can't be longer than ${NAME_MAX_SIZE} characters.`)
-
         try {
             chargepointService.findChargepoint({ "name": name })
                 .then( chargepoints => {
