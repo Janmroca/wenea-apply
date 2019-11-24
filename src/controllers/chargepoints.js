@@ -19,7 +19,7 @@ module.exports = {
             chargepointService.findChargepoint({ "name": name })
                 .then( chargepoints => {
                     if (chargepoints.length !== 0)
-                        return res.status(404).send("Already exists a chargepoint with that name.")
+                        return res.status(400).send("Already exists a chargepoint with that name.")
                     
                     chargepointService.createChargepoint(name, status)
                         .then( (id) => res.status(201).send(id.toString()) )
@@ -52,11 +52,18 @@ module.exports = {
 
     getChargepoint: async function (req, res) {
         return chargepointService.findChargepoint({ "id": req.params.id })
-            .then( chargepoints =>  { return res.status(200).send(chargepoints) })
+            .then( chargepoints =>  { 
+                if (chargepoints[0])
+                    return res.status(200).send(chargepoints[0])
+                return res.status(404).send("Doesn't exist a chargepoint with that id.")
+            })
             .catch( err => { return res.status(400).send(err) })
     },
 
     updateChargepointStatus: async function (req, res) {
+        if (!req.body.status)
+            return res.status(400).send("Status must be specified.")
+
         if (!CHARGEPOINT_STATUS.includes(req.body.status))
             return res.status(400).send("Specified status is not valid.")
 

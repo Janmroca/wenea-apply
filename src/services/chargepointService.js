@@ -1,17 +1,21 @@
 const timeFuncs = require("../helpers/time.js")
 const MongoClient = require("mongodb").MongoClient
 const uri = "mongodb+srv://janmroca:v6phcrYBDus70dFN@cluster0-el39i.mongodb.net/test?retryWrites=true&w=majority";
-let collection = undefined
-MongoClient.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-    }, (err, client) => {
-        if (err) {
-            console.error(err)
-        return
-        }
-    collection = client.db("test").collection("chargepoints");
-})
+
+let collection
+let db
+
+function initialize() {
+    return MongoClient.connect(uri, { useNewUrlParser: true, poolSize: 10, useUnifiedTopology: true })
+        .then(client => {
+            db = client
+            collection = client.db("test").collection("chargepoints")
+        })
+        .catch(error => console.log(error))
+
+}
+
+initialize()
 
 async function createChargepoint(name, status) {
     const id = await collection.find().count()
@@ -40,16 +44,26 @@ async function findChargepoint(filters) {
     return collection.find(filters).toArray()
         .then( (result) => {
             result.forEach( chargepoint => {
-                chargepoint.created_at = new Date(chargepoint.created_at)
-                chargepoint.deleted_at = new Date(chargepoint.deleted_at)
+                chargepoint.created_at = new Date(chargepoint.created_at*1000)
+                chargepoint.deleted_at = new Date(chargepoint.deleted_at*1000)
             })
             return result
         })
 }
 
+async function cleanCollection()
+{
+    return collection.drop()
+        .then( () => {
+            return
+        })
+}
+
 module.exports = {
+    initialize,
     createChargepoint,
     deleteChargepoint,
     updateChargepoint,
-    findChargepoint
+    findChargepoint,
+    cleanCollection
 }

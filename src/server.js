@@ -14,6 +14,9 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(routes);
 
-app.listen(PORT, () => {
+
+app.listen(PORT, (res) => {
     console.log(`Server started at ${IP}:${PORT}`)
-});
+})
+
+module.exports = app
